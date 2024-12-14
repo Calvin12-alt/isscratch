@@ -1,0 +1,41 @@
+h1 {
+    position: relative; /* Ensures proper positioning for the pseudo-element */
+    padding-bottom: 10px; /* Adds space between text and underline */
+text-align: center;
+top: 10px; 
+}
+  
+  h1::after {
+    content: ""; /* Creates an empty pseudo-element */
+    position: absolute; /* Positions the line relative to the h1 element */
+    left: 0;
+    bottom: 0;
+    width: 100%; /* Makes the line span the entire block width */
+    height: 2px; /* Adjust the thickness of the line */
+    background-color: black; /* Sets the color of the line */
+  }
+h3{
+    text-decoration: underline;
+    font-size: larger;
+    margin-bottom: 5px;
+}
+h5{
+    margin-top: 0;
+    margin-bottom:10px;
+    font-size: medium;
+}
+p{
+    font-size: 14px;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+li{
+    font-size: 14px;
+    margin-top: 0;
+    margin-bottom: 10px;  
+}
+h6{
+    font-size: small;
+    margin-top: 0;
+    margin-bottom: 10px;
+}

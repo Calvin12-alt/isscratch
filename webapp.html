@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <h2>Snake Game</h2>
+        <button id="startButton" onclick="startGame()">Start Game</button>
+        <canvas id="snakeGameCanvas" width="400" height="400" style="display:none;"></canvas>
+        <p id="gameStatus" style="display:none;"></p>
+        <button id="endButton" onclick="endGame()" style="display:none;">End Game</button>
+        <button onclick="window.close()">Close Game</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("snakeGameCanvas");
+        const ctx = canvas.getContext("2d");
+        const startButton = document.getElementById("startButton");
+        const endButton = document.getElementById("endButton");
+        const gameStatus = document.getElementById("gameStatus");
+
+        const scale = 20;
+        const rows = canvas.height / scale;
+        const columns = canvas.width / scale;
+
+        let snake;
+        let fruit;
+        let gameInterval;
+
+        function setup() {
+            snake = new Snake();
+            fruit = new Fruit();
+        }
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            snake.update();
+            snake.draw();
+            fruit.draw();
+
+            if (snake.eat(fruit)) {
+                fruit.randomize();
+            }
+
+            if (snake.collide()) {
+                endGame("Game Over! Click 'End Game' to restart.");
+            }
+        }
+
+        function startGame() {
+            setup();
+            canvas.style.display = "block";
+            startButton.style.display = "none";
+            gameStatus.style.display = "none";
+            endButton.style.display = "block";
+            gameInterval = setInterval(gameLoop, 100);
+        }
+
+        function endGame(status) {
+            clearInterval(gameInterval);
+            gameStatus.textContent = status || "Game Over! Click 'Start Game' to restart.";
+            gameStatus.style.display = "block";
+            endButton.style.display = "none";
+            startButton.style.display = "block";
+            canvas.style.display = "none";
+        }
+
+        function Snake() {
+            this.snakeArray = [{ x: 2, y: 2 }];
+            this.direction = "right";
+            this.length = 1;
+
+            this.draw = function () {
+                ctx.fillStyle = "green";
+                for (let i = 0; i < this.snakeArray.length; i++) {
+                    ctx.fillRect(this.snakeArray[i].x * scale, this.snakeArray[i].y * scale, scale, scale);
+                }
+            };
+
+            this.update = function () {
+                let head = { x: this.snakeArray[0].x, y: this.snakeArray[0].y };
+
+                switch (this.direction) {
+                    case "left":
+                        head.x -= 1;
+                        break;
+                    case "right":
+                        head.x += 1;
+                        break;
+                    case "up":
+                        head.y -= 1;
+                        break;
+                    case "down":
+                        head.y += 1;
+                        break;
+                }
+
+                this.snakeArray.unshift(head);
+
+                if (this.snakeArray.length > this.length) {
+                    this.snakeArray.pop();
+                }
+            };
+
+            this.eat = function (fruit) {
+                if (this.snakeArray[0].x === fruit.x && this.snakeArray[0].y === fruit.y) {
+                    this.length++;
+                    return true;
+                }
+                return false;
+            };
+
+            this.collide = function () {
+                if (
+                    this.snakeArray[0].x < 0 || 
+                    this.snakeArray[0].x >= columns ||
+                    this.snakeArray[0].y < 0 || 
+                    this.snakeArray[0].y >= rows
+                ) {
+                    return true;
+                }
+
+                for (let i = 1; i < this.snakeArray.length; i++) {
+                    if (this.snakeArray[i].x === this.snakeArray[0].x && this.snakeArray[i].y === this.snakeArray[0].y) {
+                        return true;
+                    }
+                }
+
+                return false;
+            };
+        }
+
+        function Fruit() {
+            this.x;
+            this.y;
+
+            this.randomize = function () {
+                this.x = Math.floor(Math.random() * columns);
+                this.y = Math.floor(Math.random() * rows);
+            };
+
+            this.draw = function () {
+                ctx.fillStyle = "red";
+                ctx.fillRect(this.x * scale, this.y * scale, scale, scale);
+            };
+
+            this.randomize();
+        }
+
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "ArrowLeft" && snake.direction !== "right") {
+                snake.direction = "left";
+            }
+            if (e.key === "ArrowRight" && snake.direction !== "left") {
+                snake.direction = "right";
+            }
+            if (e.key === "ArrowUp" && snake.direction !== "down") {
+                snake.direction = "up";
+            }
+            if (e.key === "ArrowDown" && snake.direction !== "up") {
+                snake.direction = "down";
+            }
+
+            if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
